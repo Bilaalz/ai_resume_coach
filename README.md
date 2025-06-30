@@ -1,11 +1,85 @@
 # 🤖 AI Resume Critiquer Pro
 
-An advanced AI-powered resume analysis tool that provides comprehensive feedback, semantic matching, and professional PDF reports.
+## Overview
+AI Resume Critiquer Pro is a web application that leverages advanced AI (OpenAI GPT-4o) to analyze resumes, provide actionable feedback, and generate professional reports. Users can upload their resume and a job description, receive detailed analysis, and download a PDF report with suggestions for improvement.
+
+## Features
+- **Resume Upload:** Supports PDF and TXT files for resume analysis.
+- **AI-Powered Analysis:** Uses OpenAI's GPT-4o to provide structured feedback, scores, and rewrite suggestions.
+- **Job Description Match:** Calculates semantic similarity between your resume and a job description using NLP techniques.
+- **Interactive UI:** Built with Streamlit for a modern, responsive user experience.
+- **PDF Report Generation:** Generates a professional PDF report summarizing the analysis and recommendations.
+- **Customizable Settings:** Users can adjust analysis depth and preferences.
+
+## Technologies & Libraries Used
+- [Streamlit](https://streamlit.io/) - For building the interactive web UI
+- [OpenAI API](https://platform.openai.com/docs/api-reference) - For AI-powered resume analysis
+- [ReportLab](https://www.reportlab.com/dev/docs/) - For generating PDF reports
+- [PyPDF2](https://pypdf2.readthedocs.io/) - For extracting text from PDF resumes
+- [scikit-learn](https://scikit-learn.org/) - For TF-IDF vectorization and semantic similarity
+- [Plotly](https://plotly.com/python/) - For data visualization (gauge charts, etc.)
+- [python-dotenv](https://pypi.org/project/python-dotenv/) - For environment variable management
+- [pandas, numpy] - For data handling and manipulation
+
+## What I Learned
+- **Integrating with APIs:** How to securely use the OpenAI API for advanced text analysis.
+- **PDF Processing:** Extracting and generating PDFs using PyPDF2 and ReportLab.
+- **Building Modern UIs:** Creating interactive, user-friendly apps with Streamlit and custom CSS.
+- **Session State Management:** Persisting data across reruns in Streamlit using `st.session_state`.
+- **Error Handling:** Providing user-friendly error messages and robust exception handling.
+- **Natural Language Processing:** Applying TF-IDF and cosine similarity for semantic matching.
+- **Data Visualization:** Using Plotly to create engaging, informative charts.
+
+## Getting Started
+
+### Prerequisites
+- Python 3.9+
+- An OpenAI API key ([get one here](https://platform.openai.com/account/api-keys))
+
+### Installation
+1. **Clone the repository:**
+   ```bash
+   git clone <repo-url>
+   cd resume_critiquer
+   ```
+2. **Create and activate a virtual environment (optional but recommended):**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. **Set up your `.env` file:**
+   Create a `.env` file in the project root with:
+   ```
+   OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   ```
+
+### Running the App
+```bash
+streamlit run main.py
+```
+
+### Usage
+- Upload your resume (PDF or TXT).
+- (Optional) Upload or paste a job description for targeted analysis.
+- Click "Analyze Resume" to receive feedback and scores.
+- Download a PDF report of your analysis.
+
+## Notes
+- Your data is processed securely and never stored.
+- For best results, use text-based (not scanned image) PDFs.
+- If you encounter issues, check your `.env` file and ensure your OpenAI API key is valid.
+
+## License
+This project is for educational and personal use. See `LICENSE` for more details.
 
 ## 🚀 Features
 
 ### Core Analysis
-- **AI-Powered Resume Analysis** using OpenAI GPT-3.5
+- **AI-Powered Resume Analysis** using OpenAI GPT-4o
 - **Multi-format Support** (PDF, TXT) with robust text extraction
 - **Comprehensive Scoring System** with detailed metrics
 - **ATS (Applicant Tracking System) Compatibility** analysis
@@ -76,101 +150,6 @@ An advanced AI-powered resume analysis tool that provides comprehensive feedback
 - **Automated Report Generation** with timestamps
 - **Downloadable Analysis** for offline review
 
-## 🎯 Resume-Ready Technical Buzzwords
-
-This project demonstrates proficiency in:
-
-### AI & Machine Learning
-- **Natural Language Processing (NLP)**
-- **Semantic Similarity Analysis**
-- **TF-IDF Vectorization**
-- **Cosine Similarity Algorithms**
-- **Machine Learning Integration**
-
-### Data Science & Analytics
-- **Data Visualization**
-- **Interactive Dashboards**
-- **Statistical Analysis**
-- **Real-time Data Processing**
-
-### Software Engineering
-- **API Integration**
-- **Web Application Development**
-- **File Processing & Validation**
-- **Error Handling & Exception Management**
-- **Session State Management**
-
-### Document Processing
-- **PDF Text Extraction**
-- **Multi-format File Support**
-- **Automated Report Generation**
-- **Document Analysis**
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Python 3.9 or higher
-- OpenAI API key
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd resume_critiquer
-```
-
-2. Install dependencies:
-```bash
-pip install -e .
-```
-
-3. Set up environment variables:
-```bash
-cp .env.example .env
-# Add your OpenAI API key to .env
-```
-
-4. Run the application:
-```bash
-streamlit run main.py
-```
-
-## 📈 Usage
-
-1. **Upload Resume**: Upload your resume in PDF or TXT format
-2. **Add Job Description**: Optionally upload or paste a job description
-3. **Get Analysis**: Receive comprehensive AI-powered feedback
-4. **View Results**: Interactive visualizations and detailed scores
-5. **Download Report**: Generate and download professional PDF reports
-
-## 🔧 Architecture
-
-```
-resume_critiquer/
-├── main.py                 # Main Streamlit application
-├── pyproject.toml         # Project dependencies
-├── README.md              # Project documentation
-└── .env                   # Environment variables
-```
-
-### Key Components
-
-- **Text Extraction Engine**: Handles PDF and TXT file processing
-- **AI Analysis Module**: Integrates with OpenAI for comprehensive feedback
-- **Semantic Matching Engine**: Uses NLP for job description matching
-- **Visualization Module**: Creates interactive charts and metrics
-- **Report Generator**: Produces professional PDF reports
-
-## 🎨 UI/UX Features
-
-- **Modern Gradient Design** with professional styling
-- **Responsive Layout** that works on all devices
-- **Interactive Navigation** with sidebar menu
-- **Real-time Feedback** with loading states
-- **Color-coded Metrics** for quick assessment
-- **Expandable Sections** for detailed information
-
 ## 🔒 Security & Privacy
 
 - **Local Processing** - Files processed locally, not stored
@@ -191,13 +170,13 @@ resume_critiquer/
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ---
 
 **Built with ❤️ using Python, Streamlit, and OpenAI**
+
+## 🎥 Demo
+
+[Click here to watch the video demo](https://youtu.be/d-S3h3ibqI4)
 
 
 
