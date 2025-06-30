@@ -18,11 +18,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import pandas as pd
 
+# Load environment variables from .env file
 load_dotenv()
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-# Page configuration
+# Streamlit page configuration
 st.set_page_config(
     page_title="AI Resume Critiquer Pro", 
     page_icon="📝", 
@@ -30,7 +29,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better UI
+# Get OpenAI API key from environment
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# Custom CSS for UI styling
 st.markdown("""
 <style>
     .main-header {
@@ -42,26 +44,38 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     .metric-card {
-        background: white;
+        background: #222;
+        color: #fff;
         padding: 1rem;
         border-radius: 10px;
         border-left: 4px solid #667eea;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .suggestion-box {
-        background: #f8f9fa;
         padding: 1rem;
         border-radius: 8px;
-        border-left: 4px solid #28a745;
         margin: 0.5rem 0;
+        font-weight: 500;
     }
     .score-high { color: #28a745; font-weight: bold; }
     .score-medium { color: #ffc107; font-weight: bold; }
     .score-low { color: #dc3545; font-weight: bold; }
+    /* Strengths: green background, dark text */
+    .suggestion-strength {
+        background: #e6f9ed;
+        border-left: 4px solid #28a745;
+        color: #155724;
+    }
+    /* Weaknesses: yellow/orange background, dark text */
+    .suggestion-weakness {
+        background: #fff4e6;
+        border-left: 4px solid #ffc107;
+        color: #856404;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state
+# Initialize session state variables for storing results and user input
 if 'analysis_results' not in st.session_state:
     st.session_state.analysis_results = None
 if 'job_description' not in st.session_state:
@@ -159,14 +173,16 @@ Job Description: {job_description if job_description else 'Not provided'}
 
 Provide only valid JSON response."""
 
+        
+        client = OpenAI(api_key=OPENAI_API_KEY)
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are an expert resume reviewer and HR professional. Provide detailed, actionable feedback in JSON format only."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.3,
-            max_tokens=2000
+            temperature=0.7,
+            max_tokens=1000
         )
 
         # Parse JSON response
@@ -441,13 +457,19 @@ if page == "📊 Resume Analysis":
                         if feedback.get('strengths'):
                             st.markdown("### ✅ Strengths")
                             for strength in feedback['strengths']:
-                                st.markdown(f"<div class='suggestion-box'>✅ {strength}</div>", unsafe_allow_html=True)
+                                st.markdown(
+                                    f"<div class='suggestion-box suggestion-strength'>✅ {strength}</div>",
+                                    unsafe_allow_html=True
+                                )
                     
                     with col2:
                         if feedback.get('weaknesses'):
                             st.markdown("### ⚠️ Areas for Improvement")
                             for weakness in feedback['weaknesses']:
-                                st.markdown(f"<div class='suggestion-box'>⚠️ {weakness}</div>", unsafe_allow_html=True)
+                                st.markdown(
+                                    f"<div class='suggestion-box suggestion-weakness'>⚠️ {weakness}</div>",
+                                    unsafe_allow_html=True
+                                )
                     
                     # Rewrite suggestions
                     suggestions = analysis_results.get('rewrite_suggestions', [])
@@ -463,12 +485,11 @@ if page == "📊 Resume Analysis":
                     if st.button("📄 Generate PDF Report"):
                         with st.spinner("Generating PDF report..."):
                             pdf_buffer = create_pdf_report(
-                                analysis_results, 
+                                st.session_state.analysis_results, 
                                 file_content, 
                                 job_role, 
                                 uploaded_file.name
                             )
-                            
                             if pdf_buffer:
                                 st.download_button(
                                     label="📥 Download PDF Report",
@@ -476,6 +497,8 @@ if page == "📊 Resume Analysis":
                                     file_name=f"resume_analysis_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.pdf",
                                     mime="application/pdf"
                                 )
+                            else:
+                                st.error("Failed to generate PDF report.")
                 
         except Exception as e:
             st.error(f"❌ An error occurred: {str(e)}")
