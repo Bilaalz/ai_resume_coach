@@ -3,6 +3,10 @@
 ## Overview
 AI Resume Critiquer Pro is a web application that leverages advanced AI (OpenAI GPT-4o) to analyze resumes, provide actionable feedback, and generate professional reports. Users can upload their resume and a job description, receive detailed analysis, and view all feedback directly in the app.
 
+## 🎥 Demo
+
+[Click here to watch the video demo](https://youtu.be/BTZQ2M6rGJA)
+
 ## Features
 - **Resume Upload:** Supports PDF and TXT files for resume analysis.
 - **AI-Powered Analysis:** Uses OpenAI's GPT-4o to provide structured feedback, scores, and rewrite suggestions.
@@ -183,9 +187,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Built with ❤️ using Python, Streamlit, and OpenAI**
 
-## 🎥 Demo
 
-[Click here to watch the video demo](https://youtu.be/d-S3h3ibqI4)
 
 
 
