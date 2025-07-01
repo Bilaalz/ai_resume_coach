@@ -6,11 +6,6 @@ import os
 from dotenv import load_dotenv
 import plotly.graph_objects as go
 import plotly.express as px
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.lib import colors
 import base64
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -181,16 +176,22 @@ Provide only valid JSON response."""
                 {"role": "system", "content": "You are an expert resume reviewer and HR professional. Provide detailed, actionable feedback in JSON format only."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.7,
-            max_tokens=1000
+            temperature=0.3,
+            max_tokens=2000
         )
 
         # Parse JSON response
         import json
+        raw_content = response.choices[0].message.content
+        # Remove code block markers and extra whitespace
+        json_str = re.sub(r"^```json|^```|```$", "", raw_content.strip(), flags=re.MULTILINE).strip()
+        # Optionally, print or display the raw response for debugging if parsing fails
         try:
-            result = json.loads(response.choices[0].message.content)
+            result = json.loads(json_str)
             return result
         except json.JSONDecodeError:
+            st.warning("Could not parse AI response as JSON. Showing fallback. See raw response below for debugging.")
+            st.code(raw_content)
             # Fallback if JSON parsing fails
             return {
                 "overall_score": 75,
@@ -213,106 +214,6 @@ Provide only valid JSON response."""
             
     except Exception as e:
         st.error(f"Error analyzing resume: {str(e)}")
-        return None
-
-def create_pdf_report(analysis_results, resume_text, job_role, filename):
-    """Generate a professional PDF report"""
-    try:
-        # Create PDF
-        buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=letter)
-        styles = getSampleStyleSheet()
-        story = []
-        
-        # Title
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=24,
-            spaceAfter=30,
-            alignment=1
-        )
-        story.append(Paragraph("AI Resume Analysis Report", title_style))
-        story.append(Spacer(1, 20))
-        
-        # File information
-        story.append(Paragraph(f"<b>File:</b> {filename}", styles['Normal']))
-        story.append(Paragraph(f"<b>Job Role:</b> {job_role if job_role else 'General'}", styles['Normal']))
-        story.append(Paragraph(f"<b>Analysis Date:</b> {pd.Timestamp.now().strftime('%B %d, %Y')}", styles['Normal']))
-        story.append(Spacer(1, 20))
-        
-        # Overall Score
-        score = analysis_results.get('overall_score', 0)
-        score_color = 'green' if score >= 80 else 'orange' if score >= 60 else 'red'
-        story.append(Paragraph(f"<b>Overall Score:</b> <font color='{score_color}'>{score}/100</font>", styles['Heading2']))
-        story.append(Spacer(1, 15))
-        
-        # Detailed Scores
-        scores = analysis_results.get('scores', {})
-        if scores:
-            score_data = [[Paragraph("<b>Category</b>", styles['Normal']), Paragraph("<b>Score</b>", styles['Normal'])]]
-            for category, score_val in scores.items():
-                category_name = category.replace('_', ' ').title()
-                score_color = 'green' if score_val >= 80 else 'orange' if score_val >= 60 else 'red'
-                score_data.append([
-                    Paragraph(category_name, styles['Normal']),
-                    Paragraph(f"<font color='{score_color}'>{score_val}/100</font>", styles['Normal'])
-                ])
-            
-            score_table = Table(score_data, colWidths=[3*inch, 1*inch])
-            score_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 12),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black)
-            ]))
-            story.append(score_table)
-            story.append(Spacer(1, 20))
-        
-        # Feedback sections
-        feedback = analysis_results.get('feedback', {})
-        
-        if feedback.get('strengths'):
-            story.append(Paragraph("<b>Strengths:</b>", styles['Heading3']))
-            for strength in feedback['strengths']:
-                story.append(Paragraph(f"• {strength}", styles['Normal']))
-            story.append(Spacer(1, 15))
-        
-        if feedback.get('weaknesses'):
-            story.append(Paragraph("<b>Areas for Improvement:</b>", styles['Heading3']))
-            for weakness in feedback['weaknesses']:
-                story.append(Paragraph(f"• {weakness}", styles['Normal']))
-            story.append(Spacer(1, 15))
-        
-        if feedback.get('improvements'):
-            story.append(Paragraph("<b>Recommendations:</b>", styles['Heading3']))
-            for improvement in feedback['improvements']:
-                story.append(Paragraph(f"• {improvement}", styles['Normal']))
-            story.append(Spacer(1, 15))
-        
-        # Rewrite suggestions
-        suggestions = analysis_results.get('rewrite_suggestions', [])
-        if suggestions:
-            story.append(Paragraph("<b>Rewrite Suggestions:</b>", styles['Heading3']))
-            for i, suggestion in enumerate(suggestions[:5], 1):  # Limit to 5 suggestions
-                story.append(Paragraph(f"<b>Suggestion {i}:</b>", styles['Normal']))
-                story.append(Paragraph(f"<b>Original:</b> {suggestion.get('original', 'N/A')}", styles['Normal']))
-                story.append(Paragraph(f"<b>Improved:</b> {suggestion.get('improved', 'N/A')}", styles['Normal']))
-                story.append(Paragraph(f"<b>Explanation:</b> {suggestion.get('explanation', 'N/A')}", styles['Normal']))
-                story.append(Spacer(1, 10))
-        
-        # Build PDF
-        doc.build(story)
-        buffer.seek(0)
-        
-        return buffer
-        
-    except Exception as e:
-        st.error(f"Error generating PDF report: {str(e)}")
         return None
 
 def get_score_color(score):
@@ -420,19 +321,24 @@ if page == "📊 Resume Analysis":
                     
                     # Detailed scores
                     scores = analysis_results.get('scores', {})
-                    if scores:
-                        st.markdown("### 📈 Detailed Scores")
-                        
+                    if not isinstance(scores, dict) or not scores:
+                        st.warning("No detailed scores returned by the AI.")
+                    else:
+                        st.markdown("### Detailed Scores")
                         col1, col2, col3 = st.columns(3)
                         score_items = list(scores.items())
-                        
                         for i, (category, score) in enumerate(score_items):
                             col = col1 if i % 3 == 0 else col2 if i % 3 == 1 else col3
+                            # Convert score to int if it's a string
+                            try:
+                                score_val = int(score)
+                            except (ValueError, TypeError):
+                                score_val = 0
                             with col:
                                 st.markdown(f"""
                                 <div class="metric-card">
                                     <h4>{category.replace('_', ' ').title()}</h4>
-                                    <p class="{get_score_color(score)}">{score}/100</p>
+                                    <p class="{get_score_color(score_val)}">{score_val}/100</p>
                                 </div>
                                 """, unsafe_allow_html=True)
                     
@@ -450,9 +356,7 @@ if page == "📊 Resume Analysis":
                     
                     # Feedback sections
                     feedback = analysis_results.get('feedback', {})
-                    
                     col1, col2 = st.columns(2)
-                    
                     with col1:
                         if feedback.get('strengths'):
                             st.markdown("### ✅ Strengths")
@@ -461,7 +365,6 @@ if page == "📊 Resume Analysis":
                                     f"<div class='suggestion-box suggestion-strength'>✅ {strength}</div>",
                                     unsafe_allow_html=True
                                 )
-                    
                     with col2:
                         if feedback.get('weaknesses'):
                             st.markdown("### ⚠️ Areas for Improvement")
@@ -470,35 +373,31 @@ if page == "📊 Resume Analysis":
                                     f"<div class='suggestion-box suggestion-weakness'>⚠️ {weakness}</div>",
                                     unsafe_allow_html=True
                                 )
-                    
+                    # Improvements
+                    if feedback.get('improvements'):
+                        st.markdown("### 🛠️ Recommendations")
+                        for improvement in feedback['improvements']:
+                            st.markdown(f"- {improvement}")
                     # Rewrite suggestions
                     suggestions = analysis_results.get('rewrite_suggestions', [])
                     if suggestions:
                         st.markdown("### ✏️ Rewrite Suggestions")
-                        for i, suggestion in enumerate(suggestions[:3], 1):  # Show top 3
+                        for i, suggestion in enumerate(suggestions[:5], 1):
                             with st.expander(f"Suggestion {i}: Improve your writing"):
                                 st.markdown(f"**Original:** {suggestion.get('original', 'N/A')}")
                                 st.markdown(f"**Improved:** {suggestion.get('improved', 'N/A')}")
                                 st.markdown(f"**Why:** {suggestion.get('explanation', 'N/A')}")
-                    
-                    # Generate PDF report
-                    if st.button("📄 Generate PDF Report"):
-                        with st.spinner("Generating PDF report..."):
-                            pdf_buffer = create_pdf_report(
-                                st.session_state.analysis_results, 
-                                file_content, 
-                                job_role, 
-                                uploaded_file.name
-                            )
-                            if pdf_buffer:
-                                st.download_button(
-                                    label="📥 Download PDF Report",
-                                    data=pdf_buffer.getvalue(),
-                                    file_name=f"resume_analysis_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                                    mime="application/pdf"
-                                )
-                            else:
-                                st.error("Failed to generate PDF report.")
+                    # Keywords missing
+                    keywords_missing = analysis_results.get('keywords_missing', [])
+                    if keywords_missing:
+                        st.markdown("### 🔑 Keywords Missing")
+                        st.markdown(", ".join(keywords_missing))
+                    # ATS recommendations
+                    ats_recommendations = analysis_results.get('ats_recommendations', [])
+                    if ats_recommendations:
+                        st.markdown("### 📝 ATS Recommendations")
+                        for rec in ats_recommendations:
+                            st.markdown(f"- {rec}")
                 
         except Exception as e:
             st.error(f"❌ An error occurred: {str(e)}")

@@ -1,20 +1,19 @@
-# 🤖 AI Resume Critiquer Pro
+# AI Resume Critiquer Pro
 
 ## Overview
-AI Resume Critiquer Pro is a web application that leverages advanced AI (OpenAI GPT-4o) to analyze resumes, provide actionable feedback, and generate professional reports. Users can upload their resume and a job description, receive detailed analysis, and download a PDF report with suggestions for improvement.
+AI Resume Critiquer Pro is a web application that leverages advanced AI (OpenAI GPT-4o) to analyze resumes, provide actionable feedback, and generate professional reports. Users can upload their resume and a job description, receive detailed analysis, and view all feedback directly in the app.
 
 ## Features
 - **Resume Upload:** Supports PDF and TXT files for resume analysis.
 - **AI-Powered Analysis:** Uses OpenAI's GPT-4o to provide structured feedback, scores, and rewrite suggestions.
 - **Job Description Match:** Calculates semantic similarity between your resume and a job description using NLP techniques.
 - **Interactive UI:** Built with Streamlit for a modern, responsive user experience.
-- **PDF Report Generation:** Generates a professional PDF report summarizing the analysis and recommendations.
 - **Customizable Settings:** Users can adjust analysis depth and preferences.
+- **All Feedback In-App:** All analysis and recommendations are displayed directly in the app for easy review and copying.
 
 ## Technologies & Libraries Used
 - [Streamlit](https://streamlit.io/) - For building the interactive web UI
 - [OpenAI API](https://platform.openai.com/docs/api-reference) - For AI-powered resume analysis
-- [ReportLab](https://www.reportlab.com/dev/docs/) - For generating PDF reports
 - [PyPDF2](https://pypdf2.readthedocs.io/) - For extracting text from PDF resumes
 - [scikit-learn](https://scikit-learn.org/) - For TF-IDF vectorization and semantic similarity
 - [Plotly](https://plotly.com/python/) - For data visualization (gauge charts, etc.)
@@ -23,12 +22,13 @@ AI Resume Critiquer Pro is a web application that leverages advanced AI (OpenAI 
 
 ## What I Learned
 - **Integrating with APIs:** How to securely use the OpenAI API for advanced text analysis.
-- **PDF Processing:** Extracting and generating PDFs using PyPDF2 and ReportLab.
+- **PDF/Text Processing:** Extracting and handling text from user-uploaded files using PyPDF2 and robust error handling.
 - **Building Modern UIs:** Creating interactive, user-friendly apps with Streamlit and custom CSS.
 - **Session State Management:** Persisting data across reruns in Streamlit using `st.session_state`.
 - **Error Handling:** Providing user-friendly error messages and robust exception handling.
 - **Natural Language Processing:** Applying TF-IDF and cosine similarity for semantic matching.
 - **Data Visualization:** Using Plotly to create engaging, informative charts.
+- **Prompt Engineering:** Crafting prompts to elicit structured, reliable responses from LLMs.
 
 ## Getting Started
 
@@ -66,7 +66,16 @@ streamlit run main.py
 - Upload your resume (PDF or TXT).
 - (Optional) Upload or paste a job description for targeted analysis.
 - Click "Analyze Resume" to receive feedback and scores.
-- Download a PDF report of your analysis.
+- All feedback and suggestions will be displayed directly in the app for you to review and copy.
+
+## Future Improvements
+- **User Authentication:** Allow users to create accounts and save their analysis history.
+- **Analysis History:** Store and display past analyses for easy comparison and tracking progress.
+- **Advanced NLP:** Integrate more advanced NLP models or custom keyword extraction for deeper analysis.
+- **Support More File Types:** Add support for DOCX and other resume formats.
+- **Improved UI/UX:** Enhance the interface with more visualizations, themes, and accessibility features.
+- **Export Options:** Add options to export feedback as text or other formats (e.g., CSV, DOCX).
+- **Customizable Feedback:** Let users select which aspects of their resume to focus on.
 
 ## Notes
 - Your data is processed securely and never stored.
