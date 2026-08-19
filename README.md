@@ -179,16 +179,8 @@ This project is for educational and personal use. See `LICENSE` for more details
 - **Industry-specific Analysis** modules
 - **Collaborative Features** for team reviews
 
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ---
 
 **Built with ❤️ using Python, Streamlit, and OpenAI**
-
-
-
-
 
 
